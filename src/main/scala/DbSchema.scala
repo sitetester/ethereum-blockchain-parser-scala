@@ -29,11 +29,11 @@ object DbSchema extends App {
 
   def addBlocksSchema(): Unit = {
     val db = Database.forConfig("dbConfig")
-    val blockNumbers = TableQuery[BlocksTable]
-    Await.result(db.run(blockNumbers.schema.create), 2.seconds)
+    val blocks = TableQuery[BlocksTable]
+    Await.result(db.run(blocks.schema.create), 2.seconds)
 
-    val transactionsTable = TableQuery[TransactionsTable]
-    Await.result(db.run(transactionsTable.schema.create), 2.seconds)
+    val transactions = TableQuery[TransactionsTable]
+    Await.result(db.run(transactions.schema.create), 2.seconds)
   }
 
   addBlocksSchema()
