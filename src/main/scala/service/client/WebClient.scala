@@ -55,9 +55,9 @@ case class Transaction(blockHash: String,
                        hash: String,
                        transactionIndex: String)
 
-case class Block(difficulty: String,
+case class Block(number: String,
                  hash: String,
-                 number: String,
+                 difficulty: String,
                  transactions: Array[Transaction],
                  var eventLogs: Array[EventLog])
 
@@ -79,8 +79,7 @@ class WebClient {
       1)
     val responseString = postRequestWithJsonString(new Gson().toJson(blockByNumberRequest))
 
-    val blockByNumberResponse =
-      new Gson().fromJson(responseString, classOf[BlockByNumberResponse])
+    val blockByNumberResponse = new Gson().fromJson(responseString, classOf[BlockByNumberResponse])
     val block = blockByNumberResponse.result
 
     if (block.hash != "") {
@@ -98,9 +97,31 @@ class WebClient {
         }
 
     val statuses = statusFutures.map(Await.result(_, Duration.Inf))
-    println()
-    statuses.foreach(println(_))
+    // println()
+    // statuses.foreach(println(_))
     block
+  }
+
+  private def getLogs(blockHash: String): Array[EventLog] = {
+
+    val p: Array[EventLogRequestParams] = Array(EventLogRequestParams(blockHash))
+    val getLogRequest = GetLogRequest("2.0", "eth_getLogs", p, 1)
+    val responseString = postRequestWithJsonString(new Gson().toJson(getLogRequest))
+
+    val eventLogResponse = new Gson().fromJson(responseString, classOf[EventLogResponse])
+    eventLogResponse.result
+  }
+
+  private def getTransactionReceipt(transactionHash: String): (String, String) = {
+
+    val transactionReceiptRequest =
+      TransactionReceiptRequest("2.0", "eth_getTransactionReceipt", Array(transactionHash), 1)
+
+    val responseString = postRequestWithJsonString(new Gson().toJson(transactionReceiptRequest))
+    val transactionReceiptResponse =
+      new Gson().fromJson(responseString, classOf[TransactionReceiptResponse])
+
+    (transactionHash, transactionReceiptResponse.result.status)
   }
 
   private def postRequestWithJsonString(jsonString: String): String = {
@@ -116,28 +137,5 @@ class WebClient {
     val responseString = EntityUtils.toString(response.getEntity)
 
     responseString
-  }
-
-  private def getLogs(blockHash: String): Array[EventLog] = {
-
-    val p: Array[EventLogRequestParams] = Array(EventLogRequestParams(blockHash))
-    val getLogRequest = GetLogRequest("2.0", "eth_getLogs", p, 1)
-    val responseString = postRequestWithJsonString(new Gson().toJson(getLogRequest))
-
-    val eventLogResponse =
-      new Gson().fromJson(responseString, classOf[EventLogResponse])
-    eventLogResponse.result
-  }
-
-  private def getTransactionReceipt(transactionHash: String): (String, String) = {
-
-    val transactionReceiptRequest =
-      TransactionReceiptRequest("2.0", "eth_getTransactionReceipt", Array(transactionHash), 1)
-
-    val responseString = postRequestWithJsonString(new Gson().toJson(transactionReceiptRequest))
-    val transactionReceiptResponse =
-      new Gson().fromJson(responseString, classOf[TransactionReceiptResponse])
-
-    (transactionHash, transactionReceiptResponse.result.status)
   }
 }

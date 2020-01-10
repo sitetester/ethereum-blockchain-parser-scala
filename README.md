@@ -1,3 +1,3 @@
-<h1>This project is based on Scala Futures </h1>
+<h2>This project is based on Scala Futures </h2>
 
-IN PROGRESS
+<h1>IN PROGRESS</h1>
