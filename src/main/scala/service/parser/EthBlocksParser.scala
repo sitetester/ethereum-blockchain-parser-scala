@@ -1,6 +1,6 @@
 package service.parser
 
-import db.{BlockNumbers, BlockNumbersTable}
+import db.{Blocks, BlocksTable, Transaction, TransactionsTable}
 import service.client.WebClient
 import slick.jdbc.SQLiteProfile.api._
 
@@ -23,21 +23,33 @@ class EthBlocksParser {
     val parsedBlocks = parsedBlocksFutures.map(Await.result(_, Duration.Inf))
 
     val db = Database.forConfig("dbConfig")
-    val BlockNumbersTable = TableQuery[BlockNumbersTable]
-    var blocksSequence = mutable.Seq[BlockNumbers]()
+
+    val blockNumbersTable = TableQuery[BlocksTable]
+    val transactionsTable = TableQuery[TransactionsTable]
+
+    var blocks = mutable.Seq[Blocks]()
 
     parsedBlocks.foreach(block => {
-      blocksSequence = blocksSequence :+ BlockNumbers(hexToLong(block.number).toInt,
-                                                      block.hash,
-                                                      hexToLong(block.difficulty))
+      var transactions = mutable.Seq[Transaction]()
+
+      for (tx <- block.transactions) {
+        transactions = transactions :+ Transaction(tx.blockHash,
+                                                   hexToInt(tx.blockNumber),
+                                                   Option(tx.from),
+                                                   Option(tx.to))
+      }
+
+      val insertTransactionsAction: Future[Option[Int]] = db.run(transactionsTable ++= transactions)
+      Await.result(insertTransactionsAction, 2.seconds)
+      blocks = blocks :+ Blocks(hexToInt(block.number), block.hash, hexToLong(block.difficulty))
     })
 
-    val insert: DBIO[Option[Int]] = BlockNumbersTable ++= blocksSequence
-    val insertAction: Future[Option[Int]] = db.run(insert)
-    val rowCount = Await.result(insertAction, 2.seconds)
+    val insertBlocksAction: Future[Option[Int]] = db.run(blockNumbersTable ++= blocks)
+    Await.result(insertBlocksAction, 2.seconds)
+  }
 
-    println(blocksSequence.toList)
-    println(rowCount)
+  def hexToInt(hexString: String): Int = {
+    Integer.valueOf(hexString.drop(2), 16)
   }
 
   def hexToLong(hexString: String): Long = {

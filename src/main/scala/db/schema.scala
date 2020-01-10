@@ -1,19 +1,11 @@
 package db
 
 import slick.jdbc.SQLiteProfile.api._
+import slick.lifted.ProvenShape
 
-/*
-case class Block(difficulty: String,
-                 hash: String,
-                 number: String,
-                 transactions: Array[Transaction],
-                 var eventLogs: Array[EventLog])
- */
+case class Blocks(number: Int, hash: String, difficulty: Long)
 
-case class BlockNumbers(number: Int, hash: String, difficulty: Long, id: Long = 0L)
-
-class BlockNumbersTable(tag: Tag) extends Table[BlockNumbers](tag, "blocks") {
-  def * = (number, hash, difficulty, id).mapTo[BlockNumbers]
+class BlocksTable(tag: Tag) extends Table[Blocks](tag, "blocks") {
 
   def number: Rep[Int] = column[Int]("number")
 
@@ -21,34 +13,37 @@ class BlockNumbersTable(tag: Tag) extends Table[BlockNumbers](tag, "blocks") {
 
   def difficulty: Rep[Long] = column[Long]("difficulty")
 
-  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def * = (number, hash, difficulty).mapTo[Blocks]
 }
 
-/*
-class Transaction(tag: Tag)
-    extends Table[(Int, String, String, String, String, String, String)](tag, "transactions") {
+case class Transaction(blockHash: String,
+                       blockNumber: Int,
+                       from: Option[String],
+                       to: Option[String])
 
-  def * : ProvenShape[(Int, String, String, String, String, String, String)] =
-    (id, blockHash, blockNumber, from, to, hash, transactionIndex)
+class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transactions") {
 
-  def id: Rep[Int] = column[Int]("id", O.PrimaryKey)
   def blockHash: Rep[String] = column[String]("blockHash")
-  def blockNumber: Rep[String] = column[String]("blockNumber")
-  def from: Rep[String] = column[String]("from")
-  def to: Rep[String] = column[String]("to")
-  def hash: Rep[String] = column[String]("hash")
-  def transactionIndex: Rep[String] = column[String]("transactionIndex")
 
-}*/
+  def * : ProvenShape[Transaction] =
+    (blockHash, blockNumber, from, to).mapTo[Transaction]
 
-case class Message(sender: String, content: String, id: Long = 0L)
+  def blockNumber: Rep[Int] = column[Int]("blockNumber")
+
+  def from: Rep[Option[String]] = column[Option[String]]("from")
+
+  def to: Rep[Option[String]] = column[Option[String]]("to")
+}
+
+case class Message(sender: String, content: Option[String], id: Long = 0L)
 
 class MessageTable(tag: Tag) extends Table[Message](tag, "messages") {
-  def * = (sender, content, id).mapTo[Message]
 
   def sender = column[String]("sender")
 
-  def content = column[String]("content")
+  def * = (sender, content, id).mapTo[Message]
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+
+  def content = column[Option[String]]("content")
 }

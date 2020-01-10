@@ -25,7 +25,7 @@ case class TransactionReceiptResponse(jsonrpc: String, id: Int, result: Transact
 
 case class EventLogTopic(hash: String)
 
-case class EventLog(
+case class EthEventLog(
     removed: Boolean,
     logIndex: String,
     transactionIndex: String,
@@ -44,24 +44,24 @@ case class GetLogRequest(jsonrpc: String,
                          params: Array[EventLogRequestParams],
                          id: Int)
 
-case class EventLogResponse(jsonrpc: String, id: Int, result: Array[EventLog])
+case class EventLogResponse(jsonrpc: String, id: Int, result: Array[EthEventLog])
 
 case class BlockByNumberRequest(jsonrpc: String, method: String, params: Array[Any], id: Int)
 
-case class Transaction(blockHash: String,
-                       blockNumber: String,
-                       from: String,
-                       to: String,
-                       hash: String,
-                       transactionIndex: String)
+case class EthTransaction(blockHash: String,
+                          blockNumber: String,
+                          from: String,
+                          to: String,
+                          hash: String,
+                          transactionIndex: String)
 
-case class Block(number: String,
-                 hash: String,
-                 difficulty: String,
-                 transactions: Array[Transaction],
-                 var eventLogs: Array[EventLog])
+case class EthBlock(number: String,
+                    hash: String,
+                    difficulty: String,
+                    transactions: Array[EthTransaction],
+                    var eventLogs: Array[EthEventLog])
 
-case class BlockByNumberResponse(jsonrpc: String, id: Int, result: Block)
+case class BlockByNumberResponse(jsonrpc: String, id: Int, result: EthBlock)
 
 class WebClient {
   val REMOTE_URL =
@@ -70,7 +70,7 @@ class WebClient {
   // https://www.rapidtables.com/convert/number/hex-to-decimal.html
   // https://infura.io/docs/ethereum/json-rpc/eth_getBlockByNumber
   // https://www.baeldung.com/httpclient-post-http-request
-  def getBlockByNumber(blockNumber: Int): Block = {
+  def getBlockByNumber(blockNumber: Int): EthBlock = {
 
     val blockByNumberRequest = BlockByNumberRequest(
       "2.0",
@@ -102,7 +102,7 @@ class WebClient {
     block
   }
 
-  private def getLogs(blockHash: String): Array[EventLog] = {
+  private def getLogs(blockHash: String): Array[EthEventLog] = {
 
     val p: Array[EventLogRequestParams] = Array(EventLogRequestParams(blockHash))
     val getLogRequest = GetLogRequest("2.0", "eth_getLogs", p, 1)
