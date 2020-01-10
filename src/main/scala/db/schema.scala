@@ -3,7 +3,7 @@ package db
 import slick.jdbc.SQLiteProfile.api._
 import slick.lifted.ProvenShape
 
-case class Blocks(number: Int, hash: String, difficulty: Long)
+case class Blocks(number: Int, hash: String, difficulty: Long, transactionsCount: Int)
 
 class BlocksTable(tag: Tag) extends Table[Blocks](tag, "blocks") {
 
@@ -13,7 +13,9 @@ class BlocksTable(tag: Tag) extends Table[Blocks](tag, "blocks") {
 
   def difficulty: Rep[Long] = column[Long]("difficulty")
 
-  def * = (number, hash, difficulty).mapTo[Blocks]
+  def * = (number, hash, difficulty, transactionsCount).mapTo[Blocks]
+
+  def transactionsCount: Rep[Int] = column[Int]("transactionsCount")
 }
 
 case class Transaction(blockHash: String,

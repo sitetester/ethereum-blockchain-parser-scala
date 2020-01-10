@@ -87,7 +87,8 @@ class WebClient {
     }
 
     // TODO: this could be fired in batch of 20 to get the combined result
-    val partialTransactions = block.transactions.take(20)
+    // val partialTransactions = block.transactions.take(20)
+    val partialTransactions = block.transactions
     val hashes = partialTransactions.map(_.hash)
 
     val statusFutures = for (hash <- hashes)

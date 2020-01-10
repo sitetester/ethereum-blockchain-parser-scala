@@ -41,7 +41,10 @@ class EthBlocksParser {
 
       val insertTransactionsAction: Future[Option[Int]] = db.run(transactionsTable ++= transactions)
       Await.result(insertTransactionsAction, 2.seconds)
-      blocks = blocks :+ Blocks(hexToInt(block.number), block.hash, hexToLong(block.difficulty))
+      blocks = blocks :+ Blocks(hexToInt(block.number),
+                                block.hash,
+                                hexToLong(block.difficulty),
+                                block.transactions.length)
     })
 
     val insertBlocksAction: Future[Option[Int]] = db.run(blockNumbersTable ++= blocks)

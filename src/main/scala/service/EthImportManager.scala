@@ -5,8 +5,16 @@ object EthImportManager {
 
   // It will save parsed data into DB
   def manageImport(): Unit = {
-    val blockNumbers = List[Int](6008149, 6008148, 6008147)
-    // val blockNumbers = List[Int](6008149)
-    new EthBlocksParser().parseBlocks(blockNumbers)
+
+    while (true) {
+      val lastScannedBlockNumber = db.DbHelper.getLastBlockNumber
+
+      val fromBlockNumber = lastScannedBlockNumber.getOrElse(0) + 1
+      val tillBlockNumber = if (fromBlockNumber == 0) 50 else 49
+      val blockNumbers = (fromBlockNumber to (fromBlockNumber + tillBlockNumber)).toList
+
+      new EthBlocksParser().parseBlocks(blockNumbers)
+      println("done with block#: " + blockNumbers.last)
+    }
   }
 }
