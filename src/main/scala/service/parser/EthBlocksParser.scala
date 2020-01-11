@@ -12,7 +12,7 @@ import scala.concurrent.{Await, Future}
 class EthBlocksParser {
 
   def parseBlocks(blockNumbers: List[Int]): Unit = {
-
+    // http://www.lihaoyi.com/post/EasyParallelProgrammingwithScalaFutures.html#parallel-http-using-futures
     val parsedBlocksFutures = for (block <- blockNumbers)
       yield {
         Future {
