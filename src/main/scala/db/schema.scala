@@ -38,14 +38,3 @@ class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transactions"
 }
 
 case class Message(sender: String, content: Option[String], id: Long = 0L)
-
-class MessageTable(tag: Tag) extends Table[Message](tag, "messages") {
-
-  def sender = column[String]("sender")
-
-  def * = (sender, content, id).mapTo[Message]
-
-  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-
-  def content = column[Option[String]]("content")
-}
