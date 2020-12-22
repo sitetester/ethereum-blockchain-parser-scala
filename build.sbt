@@ -2,7 +2,7 @@ version := "0.1"
 
 scalaVersion := "2.12.7"
 
-resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % "2.6.1"
 libraryDependencies += "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.11"

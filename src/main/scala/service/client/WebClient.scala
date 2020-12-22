@@ -64,8 +64,7 @@ case class EthBlock(number: String,
 case class BlockByNumberResponse(jsonrpc: String, id: Int, result: EthBlock)
 
 class WebClient {
-  val REMOTE_URL =
-    "https://mainnet.infura.io/v3/ae2f42cad8de499ca2cd734e5a5affe5"
+  val REMOTE_URL = "https://mainnet.infura.io/v3/" + System.getenv("INFURA_PROJECT_ID")
 
   // https://www.rapidtables.com/convert/number/hex-to-decimal.html
   // https://infura.io/docs/ethereum/json-rpc/eth_getBlockByNumber
