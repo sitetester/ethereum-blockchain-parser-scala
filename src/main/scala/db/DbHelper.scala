@@ -16,7 +16,6 @@ object DbHelper {
     // Anything we run against a database is a DBIO[T] (or a DBIOAction, more generally).
     // https://books.underscore.io/essential-slick/essential-slick-3.html
     val action = q.result
-    // println(action.statements.mkString)
 
     val result = DbHelper.exec(q.result)
     if (result.isEmpty) Some(-1) else Some(result.head)

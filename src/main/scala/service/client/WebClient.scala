@@ -91,14 +91,11 @@ class WebClient {
     val hashes = partialTransactions.map(_.hash)
 
     val statusFutures = for (hash <- hashes)
-      yield
-        Future {
-          getTransactionReceipt(hash)
-        }
+      yield Future {
+        getTransactionReceipt(hash)
+      }
 
     val statuses = statusFutures.map(Await.result(_, Duration.Inf))
-    // println()
-    // statuses.foreach(println(_))
     block
   }
 
